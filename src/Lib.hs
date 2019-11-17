@@ -32,8 +32,11 @@ checkBlack = length . filter id .: zipWith (==)
 
 -- |Calculates the number of white pins. Not commutative - 'checkWhite guess master'
 checkWhite :: Code -> Code -> Int
-checkWhite guess master = length (guess `intersect` master) - checkBlack guess master
--- TODO fix white checking logic
+checkWhite guess master = length $ master' `intersect` guess'
+  where
+    -- remove matching colors with matching positions
+    (guess', master') = foldl go ([], []) (zip guess master)
+    go (gs, ms) (g, m) = if g == m then (gs, ms) else (g:gs, m:ms)
 
 letterToColor :: Char -> Maybe Color
 letterToColor c = case c of
