@@ -1,5 +1,6 @@
 module Main where
 
+import AutoSolve
 import Lib
 import System.Random
 
@@ -13,4 +14,8 @@ genCode = do
   return $ take numPins randColors
 
 main :: IO ()
-main = genCode >>= nRounds rounds
+main = do
+  code <- genCode
+  print code
+  print . runKnuth' $ code
+  --nRounds rounds
