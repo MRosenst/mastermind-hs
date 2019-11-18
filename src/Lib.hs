@@ -54,10 +54,10 @@ restart master = putStrLn "Invalid guess!" >> singleRound master
 singleRound :: Code -> IO Bool
 singleRound master = do
   putStrLn "Enter a guess:"
-  guessMay <- fmap (sequenceA . map letterToColor . filter isAlpha) getLine
+  guessMay <- fmap (traverse letterToColor . filter isAlpha) getLine
   case guessMay of
     Nothing -> restart master
-    Just guess -> do
+    Just guess ->
       if length guess /= numPins
         then restart master
         else do
