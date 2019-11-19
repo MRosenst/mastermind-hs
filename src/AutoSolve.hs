@@ -2,6 +2,7 @@ module AutoSolve where
 
 import Control.Monad
 import Data.List
+import qualified Data.Map as M
 import Data.Ord
 import Lib
 
@@ -14,8 +15,17 @@ initialGuess = [Red, Red, Orange, Orange]
 eliminates :: [Code] -> Code -> (Int, Int) -> Int
 eliminates candidates guess pegs = length $ filter (\c -> (checkBlack guess c, checkWhite guess c) /= pegs) candidates
 
+hitCount :: [Code] -> Code -> M.Map (Int, Int) Int
+hitCount candidates guess = foldl go M.empty candidates
+    where
+        pins m = (checkBlack guess m, checkWhite guess m)
+        go acc master = 
+            if pins master `M.member` acc
+                then M.adjust (+1) (pins master) acc
+                else M.insert (pins master) 1 acc
+
 score :: [Code] -> Code -> Int
-score candidates guess = minimum [eliminates candidates guess (b,w) | b<-[0..numPins], w<-[0..numPins - b]]
+score candidates guess = length candidates - maximum (hitCount candidates guess)
 
 minMax :: [Code] -> Code
 minMax candidates = maximumBy (comparing (\g -> (score candidates g, g `elem` candidates))) allColorCombos
